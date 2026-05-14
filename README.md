@@ -359,17 +359,17 @@ zmx-select() {
 ```
 
 OR if you're using ZSH
-```bash
+```zsh
 _zmx-select() {
     # Prepare terminal for interactive fzf
     zle -I
 
     local output selected action cmd
     output=$(zmx list --short 2>/dev/null | fzf \
-        --prompt='ZMX [C-k > Kill | C-n > New | C-\ > Detach]' \
+        --prompt='ZMX [C-k > Kill | C-n > New]' \
         --expect=enter,ctrl-k,ctrl-n \
         --layout=reverse \
-        --preview='zmx list | grep {1}; zmx history {1} | /usr/bin/tail -n 30' \
+        --preview='zmx list | grep -F {1}; zmx history {1} | tail -n 30' \
         --preview-window=right:66%
     )
 
@@ -387,7 +387,7 @@ _zmx-select() {
             fi
             ;;
         ctrl-n)
-            local new_session="$(basename "$PWD")-$(date +%s)-$IDE_TERM"
+            local new_session="$(basename "$PWD")-$(date +%s)"
             cmd="zmx attach ${(q)new_session}"
             ;;
         ctrl-k)
@@ -411,6 +411,8 @@ _zmx-select() {
     fi
 }
 zle -N _zmx-select
+# Note: This overrides the default Ctrl-Z suspend behavior
+# Consider using a different keybinding if you need job control suspend
 bindkey '^z' _zmx-select
 ```
 
